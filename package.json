@@ -1,0 +1,123 @@
+{
+  "name": "@armature-tech/ai-traffic",
+  "version": "0.0.0-development",
+  "private": true,
+  "type": "module",
+  "description": "Server and edge request analytics for AI crawler traffic.",
+  "license": "Apache-2.0",
+  "author": "Armature <support@armature.tech>",
+  "homepage": "https://github.com/armature-tech/ai-traffic#readme",
+  "bugs": {
+    "url": "https://github.com/armature-tech/ai-traffic/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/armature-tech/ai-traffic.git"
+  },
+  "keywords": [
+    "ai",
+    "crawler",
+    "bot",
+    "analytics",
+    "vercel",
+    "cloudflare",
+    "armature"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": false,
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./vercel": {
+      "import": {
+        "types": "./dist/esm/vercel.d.ts",
+        "default": "./dist/esm/vercel.js"
+      },
+      "require": {
+        "types": "./dist/cjs/vercel.d.ts",
+        "default": "./dist/cjs/vercel.js"
+      }
+    },
+    "./cloudflare": {
+      "import": {
+        "types": "./dist/esm/cloudflare.d.ts",
+        "default": "./dist/esm/cloudflare.js"
+      },
+      "require": {
+        "types": "./dist/cjs/cloudflare.d.ts",
+        "default": "./dist/cjs/cloudflare.js"
+      }
+    },
+    "./express": {
+      "import": {
+        "types": "./dist/esm/express.d.ts",
+        "default": "./dist/esm/express.js"
+      },
+      "require": {
+        "types": "./dist/cjs/express.d.ts",
+        "default": "./dist/cjs/express.js"
+      }
+    },
+    "./hono": {
+      "import": {
+        "types": "./dist/esm/hono.d.ts",
+        "default": "./dist/esm/hono.js"
+      },
+      "require": {
+        "types": "./dist/cjs/hono.d.ts",
+        "default": "./dist/cjs/hono.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "docs",
+    "examples",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:markers": "node -e \"require('fs').writeFileSync('dist/esm/package.json', '{\\\"type\\\":\\\"module\\\"}\\n'); require('fs').writeFileSync('dist/cjs/package.json', '{\\\"type\\\":\\\"commonjs\\\"}\\n')\"",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:markers && node scripts/stamp-version.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "check:examples": "tsc --noEmit -p examples/tsconfig.json",
+    "test:frameworks": "npm run build && node scripts/test-frameworks.mjs",
+    "test:release-canary": "npm run build && node scripts/run-release-dry-run.mjs",
+    "check": "npm run typecheck && npm test && npm run check:examples",
+    "test:artifact-canary": "npm run build && node scripts/check-pack.mjs && node scripts/run-publish-canary.mjs",
+    "prepublishOnly": "npm run check && npm run build && node scripts/check-pack.mjs"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260826.1",
+    "@types/express": "5.0.6",
+    "@types/node": "^22.10.2",
+    "express": "5.2.1",
+    "hono": "4.13.5",
+    "next": "16.3.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "typescript": "^5.7.2"
+  }
+}

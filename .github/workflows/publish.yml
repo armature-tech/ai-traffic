@@ -1,0 +1,118 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact semantic version, such as 0.1.0
+        required: true
+        type: string
+      confirm_package:
+        description: Type @armature-tech/ai-traffic
+        required: true
+        type: string
+      dry_run:
+        description: Build and test without publishing
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: publish-ai-traffic-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Verify and publish the exact package
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm-production
+    steps:
+      - name: Validate release input
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          CONFIRM_PACKAGE: ${{ inputs.confirm_package }}
+        run: |
+          set -euo pipefail
+          [[ "${CONFIRM_PACKAGE}" == "@armature-tech/ai-traffic" ]] || { echo "Package confirmation does not match." >&2; exit 1; }
+          [[ "${RELEASE_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "Version is not valid semantic version text." >&2; exit 1; }
+
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Set exact package version
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: npm version "${RELEASE_VERSION}" --no-git-tag-version
+
+      - name: Run source and artifact checks
+        run: |
+          npm run check
+          npm run test:artifact-canary
+
+      - name: Unlock the reviewed release copy
+        run: npm pkg delete private
+
+      - name: Pack exact release file
+        id: pack
+        env:
+          ARMATURE_AI_TRAFFIC_RELEASE_UNLOCKED: "1"
+        run: |
+          set -euo pipefail
+          npm pack --json --ignore-scripts > "${RUNNER_TEMP}/pack.json"
+          tarball="$(node -e 'const p=require(process.argv[1]); process.stdout.write(p[0].filename)' "${RUNNER_TEMP}/pack.json")"
+          sha256sum "${tarball}" | tee "${tarball}.sha256"
+          echo "artifact=${PWD}/${tarball}" >> "${GITHUB_OUTPUT}"
+          echo "checksum=${PWD}/${tarball}.sha256" >> "${GITHUB_OUTPUT}"
+          node scripts/check-pack.mjs
+
+      - name: Install and test the exact release file
+        run: node scripts/run-publish-canary.mjs "${{ steps.pack.outputs.artifact }}"
+
+      - name: Save reviewed release files
+        uses: actions/upload-artifact@v5
+        with:
+          name: ai-traffic-${{ inputs.version }}
+          path: |
+            ${{ steps.pack.outputs.artifact }}
+            ${{ steps.pack.outputs.checksum }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish exact release file
+        if: inputs.dry_run == false
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish "${{ steps.pack.outputs.artifact }}" --access public --provenance --ignore-scripts
+
+      - name: Create matching GitHub release
+        if: inputs.dry_run == false
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          gh release create "v${RELEASE_VERSION}" \
+            "${{ steps.pack.outputs.artifact }}" \
+            "${{ steps.pack.outputs.checksum }}" \
+            --target "${GITHUB_SHA}" \
+            --title "v${RELEASE_VERSION}" \
+            --notes "Published @armature-tech/ai-traffic@${RELEASE_VERSION} from ${GITHUB_SHA}."
+
+      - name: Report dry run
+        if: inputs.dry_run == true
+        run: echo "Dry run complete. No package was published."
