@@ -2,13 +2,13 @@
 
 ## The site is empty
 
-Confirm that the exact host is verified. Confirm that the deployed key belongs to the same region and site. Then request a normal page with a known crawler user agent in a controlled test.
+Confirm that the exact host is added to the Armature site. Confirm that the deployed key belongs to the same region and site. Then request a normal page with a known crawler user agent in a controlled test.
 
 No traffic can also mean that no crawler visited the site yet.
 
 ## The domain returned to pending
 
-Keep the Armature DNS TXT record after verification. The check job runs each hour. A host becomes due 24 hours after its last check. It needs at least three negative checks and 48 hours before it stops ingestion. A timeout or resolver error does not remove verification.
+A pending domain still sends private analytics. Restore the Armature TXT record only if you need the verified ownership state.
 
 ## The adapter does not run
 

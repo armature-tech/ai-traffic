@@ -18,6 +18,10 @@ The HTTPS request uses the key as a bearer credential. The event UUID makes retr
 
 Armature applies source-IP and key-ID limits before the scrypt key check. It also applies per-site request, event, and monthly limits after authentication.
 
+## Domain proof
+
+A configured host can send private analytics without DNS verification. An optional DNS TXT record proves control of the host. It supports a verified ownership state and domain transfer. It does not change DNS routing or page speed.
+
 ## Verification states
 
 - `verified`: The IP matches a current official range.
