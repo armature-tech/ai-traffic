@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
 import test from "node:test";
 import { performance } from "node:perf_hooks";
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import {
   candidateDecision,
   createAiTraffic,
@@ -13,7 +15,8 @@ import {
 } from "../dist/esm/index.js";
 
 const require = createRequire(import.meta.url);
-const { CRAWLERS, UNKNOWN_CRAWLER_HINTS } = require("../../../lib/crawler-analytics/catalog.js");
+const serverCatalogUrl = new URL("../../../lib/crawler-analytics/catalog.js", import.meta.url);
+const serverCatalog = existsSync(fileURLToPath(serverCatalogUrl)) ? require(fileURLToPath(serverCatalogUrl)) : null;
 
 const API_KEY = `ait_us_${randomUUID().replaceAll("-", "")}_${"s".repeat(43)}`;
 
@@ -27,7 +30,10 @@ test("every known AI token passes the local filter", () => {
   }
 });
 
-test("the built SDK, server, and landing prefilters have exact catalog parity", async () => {
+test("the built SDK, server, and landing prefilters have exact catalog parity", {
+  skip: !serverCatalog && "monorepo-only parity check",
+}, async () => {
+  const { CRAWLERS, UNKNOWN_CRAWLER_HINTS } = serverCatalog;
   assert.deepEqual([...KNOWN_AI_CRAWLER_TOKENS].sort(), CRAWLERS.map((crawler) => crawler.token).sort());
   assert.deepEqual([...GENERIC_BOT_HINTS].sort(), [...UNKNOWN_CRAWLER_HINTS].sort());
   const landing = await readFile(new URL("../../../apps/landing/middleware.ts", import.meta.url), "utf8");
