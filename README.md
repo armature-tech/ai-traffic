@@ -2,6 +2,14 @@
 
 This package records AI crawler requests on your server or edge. Browser analytics cannot do this because many crawlers do not run page JavaScript.
 
+## Install with an AI agent
+
+Copy this prompt into your coding agent:
+
+```text
+Install Armature AI Traffic in this project. Use @armature-tech/ai-traffic and follow https://docs.armature.tech/ai-traffic/agent-install. Complete the code, secret, DNS, deployment, and production test. Ask me only for values or access that you cannot get. Do not expose the write key or add client-side tracking.
+```
+
 ## Next.js 16 quickstart
 
 Install the package:
@@ -40,7 +48,7 @@ The tracking call does not change the page response. `event.waitUntil()` keeps d
 
 ## Before you deploy
 
-Add every exact host in Armature. Add the shown DNS TXT record. Then verify the host. `example.com` and `docs.example.com` are separate hosts. Wildcards are not supported.
+AI Traffic is in private beta. Ask Armature to create the site and write key. Add the DNS TXT record that Armature gives you. Then tell Armature to verify the host. `example.com` and `docs.example.com` are separate hosts. Wildcards are not supported.
 
 Keep the TXT record. The check job runs each hour. A host becomes due 24 hours after its last check. One missing answer does not stop ingestion. Armature needs at least three negative checks and 48 hours before it returns the host to `pending`. A DNS timeout does not change the host state.
 
