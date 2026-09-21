@@ -30,6 +30,17 @@ test("every known AI token passes the local filter", () => {
   }
 });
 
+test("Meta search and ads crawlers bypass unknown-bot sampling", () => {
+  for (const token of ["meta-webindexer", "meta-externalads"]) {
+    for (const suffix of ["", " (+https://developers.facebook.com/documentation/sharing/webmasters/web-crawlers)"]) {
+      assert.deepEqual(candidateDecision({
+        userAgent: `${token.toUpperCase()}/1.1${suffix}`,
+        path: "/docs", method: "GET", unknownBotSampleRate: 0,
+      }), { track: true, reason: "known_ai" });
+    }
+  }
+});
+
 test("the built SDK, server, and landing prefilters have exact catalog parity", {
   skip: !serverCatalog && "monorepo-only parity check",
 }, async () => {

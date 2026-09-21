@@ -5,7 +5,7 @@ export const KNOWN_AI_CRAWLER_TOKENS = Object.freeze([
   "Google-InspectionTool", "Google-CloudVertexBot", "Google-NotebookLM",
   "Google-Read-Aloud", "Google-Agent", "GoogleAgent", "GoogleOther", "Googlebot",
   "Bingbot", "msnbot", "Copilot", "Applebot", "Amzn-SearchBot", "Amzn-User",
-  "Amazonbot", "DuckAssistBot", "meta-externalfetcher", "meta-externalagent",
+  "Amazonbot", "DuckAssistBot", "meta-externalfetcher", "meta-webindexer", "meta-externalagent", "meta-externalads",
   "facebookexternalhit", "FacebookBot", "Grok-DeepSearch", "xAI-SearchBot",
   "xAI-Web-Crawler", "xAI-Bot", "GrokBot", "MistralAI-User", "MistralAI-Index",
   "Kimi-SearchBot", "Kimi-User", "KimiBot", "TikTokSpider", "Bytespider",
