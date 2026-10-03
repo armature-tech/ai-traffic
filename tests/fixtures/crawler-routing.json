@@ -19,7 +19,8 @@
     "Bytespider/1.0",
     "Qwen-User/1.0",
     "DeepSeekBot/1.0",
-    "CCBot/2.0"
+    "CCBot/2.0",
+    "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ShapBot/0.1.0"
   ],
   "normal": [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36",

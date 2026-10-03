@@ -41,6 +41,13 @@ test("Meta search and ads crawlers bypass unknown-bot sampling", () => {
   }
 });
 
+test("Parallel's ShapBot bypasses unknown-bot sampling", () => {
+  assert.deepEqual(candidateDecision({
+    userAgent: "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ShapBot/0.1.0",
+    path: "/docs", method: "GET", unknownBotSampleRate: 0,
+  }), { track: true, reason: "known_ai" });
+});
+
 test("the built SDK, server, and landing prefilters have exact catalog parity", {
   skip: !serverCatalog && "monorepo-only parity check",
 }, async () => {
