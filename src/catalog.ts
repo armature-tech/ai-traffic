@@ -10,7 +10,7 @@ export const KNOWN_AI_CRAWLER_TOKENS = Object.freeze([
   "xAI-Web-Crawler", "xAI-Bot", "GrokBot", "MistralAI-User", "MistralAI-Index",
   "Kimi-SearchBot", "Kimi-User", "KimiBot", "TikTokSpider", "Bytespider",
   "Doubaobot", "Baiduspider", "ERNIEBot", "Qwen-User", "QwenBot", "DeepSeekBot",
-  "cohere-training-data-crawler", "cohere-ai", "AI2Bot", "CCBot", "YouBot",
+  "cohere-training-data-crawler", "cohere-ai", "AI2Bot", "CCBot", "YouBot", "ShapBot",
 ]);
 
 export const GENERIC_BOT_HINTS = Object.freeze(["bot", "crawler", "spider", "slurp", "fetcher", "headless"]);
