@@ -48,6 +48,28 @@ test("Parallel's ShapBot bypasses unknown-bot sampling", () => {
   }), { track: true, reason: "known_ai" });
 });
 
+test("AWS indexing crawlers are delivered even when generic bot sampling is disabled", async () => {
+  const batches = [];
+  const tracker = createAiTraffic({
+    apiKey: API_KEY,
+    delivery: "await",
+    unknownBotSampleRate: 0,
+    fetch: async (_url, init) => {
+      batches.push(JSON.parse(String(init.body)));
+      return new Response(null, { status: 202 });
+    },
+  });
+  for (const userAgent of ["amazon-kendra", "amazon-QBusiness", "AMAZON-KENDRA/1.0", "AMAZON-QBUSINESS/1.0"]) {
+    await tracker.track(request(userAgent));
+  }
+  const events = batches.flatMap((batch) => batch.events);
+  assert.equal(events.length, 4);
+  assert.deepEqual(events.map((event) => event.userAgent), [
+    "amazon-kendra", "amazon-QBusiness", "AMAZON-KENDRA/1.0", "AMAZON-QBUSINESS/1.0",
+  ]);
+  assert.ok(events.every((event) => event.sampleRate === undefined));
+});
+
 test("the built SDK, server, and landing prefilters have exact catalog parity", {
   skip: !serverCatalog && "monorepo-only parity check",
 }, async () => {
